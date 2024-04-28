@@ -1,0 +1,30 @@
+FROM ubuntu:24.04 AS builder
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && \
+    apt-get install -y \
+        linux-headers-generic \
+        libbpf-dev \
+        llvm \
+        clang \
+        golang && \
+    apt-get clean
+
+RUN ln -sf /usr/include/asm-generic /usr/include/asm
+
+RUN go env -w  \
+    GO111MODULE=on \
+    GOSUMDB=off \
+    GOPROXY=https://goproxy.cn,direct
+
+# GOPRIVATE=
+# GONOPROXY=
+
+WORKDIR /app
+COPY . .
+RUN go generate ./...
+
+FROM scratch AS binaries
+WORKDIR /
+COPY --from=builder /app/counter_* .
