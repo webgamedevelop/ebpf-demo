@@ -3,3 +3,7 @@
 ```shell
 make build
 ```
+## Run
+```shell
+./bin/ebpf-demo
+```
