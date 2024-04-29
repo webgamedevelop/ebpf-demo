@@ -1,6 +1,8 @@
 OS ?= linux
 ARCH ?= amd64
 
+CONTAINER_TOOL ?= docker
+
 ##@ General
 .PHONY: help
 help: ## Display this help.
@@ -9,7 +11,10 @@ help: ## Display this help.
 ##@ Development
 .PHONY: generate
 generate: ## Run `go generate` in a Docker container.
-	DOCKER_BUILDKIT=1 docker build --output=. --target=binaries -f Dockerfile-generator .
+	$(CONTAINER_TOOL) buildx create --name ebpf-obj-builder
+	$(CONTAINER_TOOL) buildx use ebpf-obj-builder
+	$(CONTAINER_TOOL) buildx build --output=. --target=binaries -f Dockerfile-generator .
+	$(CONTAINER_TOOL) buildx rm ebpf-obj-builder
 
 .PHONY: build
 build: $(LOCALBIN) generate ## Build the application.
