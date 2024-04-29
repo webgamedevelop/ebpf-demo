@@ -1,5 +1,5 @@
 OS ?= linux
-ARCH ?= amd64
+ARCH ?= amd64 # amd64|arm64
 
 CONTAINER_TOOL ?= docker
 
@@ -13,7 +13,7 @@ help: ## Display this help.
 generate: ## Run `go generate` in a Docker container.
 	$(CONTAINER_TOOL) buildx create --name ebpf-obj-builder
 	$(CONTAINER_TOOL) buildx use ebpf-obj-builder
-	$(CONTAINER_TOOL) buildx build --output=. --target=binaries -f Dockerfile-generator .
+	$(CONTAINER_TOOL) buildx build --platform=$(OS)/$(ARCH) --output=. --target=binaries -f Dockerfile-generator .
 	$(CONTAINER_TOOL) buildx rm ebpf-obj-builder
 
 .PHONY: build
